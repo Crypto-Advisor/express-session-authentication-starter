@@ -5,6 +5,7 @@ var passport = require('passport');
 var crypto = require('crypto');
 var routes = require('./routes');
 const connection = require('./config/database');
+const { connect } = require('mongoose');
 
 // Package documentation - https://www.npmjs.com/package/connect-mongo
 const MongoStore = require('connect-mongo')(session);
@@ -29,8 +30,17 @@ app.use(express.urlencoded({extended: true}));
 /**
  * -------------- SESSION SETUP ----------------
  */
+const sessionStore = new MongoStore({ mongooseConnection: connection, collection: 'sessions'})
 
-// TODO
+app.use(session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: true,
+    store: sessionStore,
+    cookie:{
+        maxAge: 1000 * 60 * 60 * 24
+    }
+}));
 
 /**
  * -------------- PASSPORT AUTHENTICATION ----------------
